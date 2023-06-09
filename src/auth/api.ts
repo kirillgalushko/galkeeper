@@ -1,8 +1,9 @@
-import { api } from "../api/api";
+import { post } from "../api/http";
 import { User } from "../user/User";
 
-export const login = (data: { email: string; password: string }) => {
-  return api.post("/auth/login", data);
+export const login = async (data: { email: string; password: string }) => {
+  return await post("/auth/login", data);
 };
 
-export const register = (data: User) => api.post("/auth/register", data);
+export const register = async (data: User) =>
+  await post("/auth/register", data);
