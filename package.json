@@ -47,6 +47,7 @@
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.43.9",
     "react-icons": "^4.8.0",
+    "react-jss": "^10.10.0",
     "react-redux": "^8.0.7",
     "redux": "^4.2.1",
     "redux-actions": "^3.0.0",
