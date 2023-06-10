@@ -48,6 +48,8 @@ export const RegistrationForm = ({ onLogin }: Props) => {
             <Input
               fullWidth
               placeholder="Почта"
+              clearable
+              size="lg"
               {...registerInput("email", { required: true })}
             />
           </Grid>
@@ -55,6 +57,8 @@ export const RegistrationForm = ({ onLogin }: Props) => {
             <Input
               fullWidth
               placeholder="Пароль"
+              clearable
+              size="lg"
               {...registerInput("password", { required: true })}
             />
           </Grid>

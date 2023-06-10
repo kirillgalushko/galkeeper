@@ -9,6 +9,7 @@ module.exports = {
   entry: "./src/index.tsx",
   output: {
     path: __dirname + "/build/",
+    publicPath: "/",
   },
   module: {
     rules: [
@@ -27,6 +28,9 @@ module.exports = {
     ],
   },
   devtool: prod ? undefined : "source-map",
+  devServer: {
+    historyApiFallback: true,
+  },
   plugins: [
     new HtmlWebpackPlugin({
       favicon: "./public/favicon.ico",

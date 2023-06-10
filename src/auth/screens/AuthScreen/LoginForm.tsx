@@ -46,6 +46,8 @@ export const LoginForm = ({ onRegistration }: Props) => {
             <Input
               fullWidth
               placeholder="Почта"
+              clearable
+              size="lg"
               {...register("email", { required: true })}
             />
             {errors.email && <span>This field is required</span>}
@@ -54,6 +56,8 @@ export const LoginForm = ({ onRegistration }: Props) => {
             <Input
               fullWidth
               placeholder="Пароль"
+              clearable
+              size="lg"
               {...register("password", { required: true })}
             />
             {errors.password && <span>This field is required</span>}

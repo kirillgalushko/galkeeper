@@ -1,13 +1,10 @@
-import React from "react";
-import { PersistGate } from "redux-persist/integration/react";
+import React, { useEffect } from "react";
 import { NextUIProvider, createTheme } from "@nextui-org/react";
-import { useDarkMode } from "./utils";
-import { useSelector } from "react-redux";
-import { isAuthorizedSelector } from "./auth/selectors";
-import { AuthScreen } from "./auth/screens/AuthScreen/AuthScreen";
-import { Provider as ReduxProvider } from "react-redux";
-import { store, persistor } from "./store";
-import { ProfileScreen } from "./auth/screens/ProfileScreen/ProfileScreen";
+import { useDarkMode } from "./hooks/useDarkMode";
+import { store } from "./storage/redux";
+import { Router } from "./router";
+import { useDispatch } from "react-redux";
+import { requestUpdateEntities } from "./entities/actions";
 
 const lightTheme = createTheme({
   type: "light",
@@ -18,23 +15,19 @@ const darkTheme = createTheme({
 });
 
 const App = () => {
-  const isAuthorized = useSelector(isAuthorizedSelector);
-
-  if (isAuthorized) return <ProfileScreen />;
-  return <AuthScreen />;
-};
-
-const AppWithProviders = () => {
   const isDarkMode = useDarkMode();
+  const dispatch = useDispatch();
+  console.log(store.getState());
+
+  useEffect(() => {
+    dispatch(requestUpdateEntities());
+  }, []);
+
   return (
-    <ReduxProvider store={store}>
-      <NextUIProvider theme={isDarkMode ? darkTheme : lightTheme}>
-        <PersistGate loading={null} persistor={persistor}>
-          <App />
-        </PersistGate>
-      </NextUIProvider>
-    </ReduxProvider>
+    <NextUIProvider theme={isDarkMode ? darkTheme : lightTheme}>
+      <Router />
+    </NextUIProvider>
   );
 };
 
-export default AppWithProviders;
+export default App;

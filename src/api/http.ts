@@ -1,9 +1,13 @@
 import { FetchError } from "./FetchError";
+import { store } from "../storage/redux";
+import { clearUser } from "../user/reducer";
+import { clearToken } from "../auth/reducer";
 
-const HEADERS = {
+const getHeaders = () => ({
   Accept: "application/json",
   "Content-Type": "application/json",
-};
+  Authorization: `Bearer ${store.getState().auth}`,
+});
 const API_URL = "http://localhost:3001";
 
 const handleResponse = async (rawResponse: Response) => {
@@ -11,23 +15,29 @@ const handleResponse = async (rawResponse: Response) => {
     return rawResponse.json();
   }
   const body = await rawResponse?.json?.();
+
+  if (rawResponse.status === 401) {
+    store.dispatch(clearToken());
+    store.dispatch(clearUser());
+  }
+
   throw new FetchError(rawResponse.status, body.message, rawResponse);
 };
 
-export const get = async (endpoint: string, params: any) => {
+export const get = async (endpoint: string, params?: Record<string, any>) => {
   const rawResponse = await fetch(`${API_URL}${endpoint}`, {
     method: "GET",
-    headers: HEADERS,
-    body: JSON.stringify(params),
+    headers: getHeaders(),
+    body: params ? JSON.stringify(params) : undefined,
   });
   return handleResponse(rawResponse);
 };
 
-export const post = async (endpoint: string, params: Record<string, any>) => {
+export const post = async (endpoint: string, params?: Record<string, any>) => {
   const rawResponse = await fetch(`${API_URL}${endpoint}`, {
     method: "POST",
-    headers: HEADERS,
-    body: JSON.stringify(params),
+    headers: getHeaders(),
+    body: params ? JSON.stringify(params) : undefined,
   });
   return handleResponse(rawResponse);
 };
