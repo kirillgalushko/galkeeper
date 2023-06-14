@@ -1,8 +1,7 @@
-import { createAction, createReducer } from "@reduxjs/toolkit";
+import { createReducer } from "@reduxjs/toolkit";
+import { setUser } from "./actions";
+import { clearUser } from "./actions";
 import { User } from "./types";
-
-export const setUser = createAction<User>("SET_USER");
-export const clearUser = createAction<void>("CLEAR_USER");
 
 const defaultState = null;
 

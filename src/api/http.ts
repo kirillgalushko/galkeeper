@@ -1,7 +1,6 @@
 import { FetchError } from "./FetchError";
 import { store } from "../storage/redux";
-import { clearUser } from "../user/reducer";
-import { clearToken } from "../auth/reducer";
+import { logout } from "../auth/actions";
 
 const getHeaders = () => ({
   Accept: "application/json",
@@ -17,8 +16,7 @@ const handleResponse = async (rawResponse: Response) => {
   const body = await rawResponse?.json?.();
 
   if (rawResponse.status === 401) {
-    store.dispatch(clearToken());
-    store.dispatch(clearUser());
+    store.dispatch(logout());
   }
 
   throw new FetchError(rawResponse.status, body.message, rawResponse);

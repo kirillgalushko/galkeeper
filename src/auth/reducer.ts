@@ -1,7 +1,5 @@
-import { createAction, createReducer } from "@reduxjs/toolkit";
-
-export const setToken = createAction<string>("SET_TOKEN");
-export const clearToken = createAction<void>("CLEAR_TOKEN");
+import { createReducer } from "@reduxjs/toolkit";
+import { setToken, clearToken } from "./actions";
 
 const defaultState = null;
 

@@ -3,16 +3,14 @@ import { createUseStyles } from "react-jss";
 import { Outlet } from "react-router-dom";
 import { Button } from "@nextui-org/react";
 import { useDispatch } from "react-redux";
-import { clearUser } from "../user/reducer";
-import { clearToken } from "../auth/reducer";
+import { logout } from "../auth/actions";
 
 export const AuthorizedLayout = () => {
   const dispatch = useDispatch();
   const styles = useStyles();
 
   const onLogout = () => {
-    dispatch(clearToken());
-    dispatch(clearUser());
+    dispatch(logout());
   };
 
   return (

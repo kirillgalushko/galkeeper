@@ -2,8 +2,8 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { register } from "../../api";
 import { useDispatch } from "react-redux";
-import { setToken } from "../../reducer";
-import { setUser } from "../../../user/reducer";
+import { setToken } from "../../actions";
+import { setUser } from "../../../user/actions";
 import { Grid, Button, Input, Text, Link } from "@nextui-org/react";
 import { FetchError } from "../../../api/FetchError";
 
