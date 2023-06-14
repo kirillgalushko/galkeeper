@@ -1,25 +1,46 @@
-import { spawn, select, delay } from "redux-saga/effects";
+import {
+  spawn,
+  select,
+  delay,
+  call,
+  put,
+  takeLatest,
+  all,
+} from "redux-saga/effects";
 import type { SagaIterator } from "redux-saga";
 import { isAuthorizedSelector } from "../auth/selectors";
+import { sync } from "./api";
+import { requestUpdateEntities } from "../entities/actions";
+import { setSyncDate, requestSync } from "./actions";
+import { syncedAtSelector } from "./selectors";
 
-const minute = 10000;
+const timeout = 5000;
 
 function* continuouslySyncEntities(): SagaIterator<void> {
   while (true) {
-    const isAuthorized = isAuthorizedSelector(yield select());
+    yield call(handleSync);
+    yield delay(timeout);
+  }
+}
 
-    if (isAuthorized) {
-      try {
-        // TODO: Add sync logic
-      } catch (e) {
-        // Ignore, keep trying
-      }
+function* handleSync(): SagaIterator<void> {
+  const isAuthorized = isAuthorizedSelector(yield select());
+  const lastSyncedAt = syncedAtSelector(yield select()) ?? undefined;
+
+  if (isAuthorized) {
+    try {
+      const syncedAt: Date = yield call(() => sync(lastSyncedAt));
+      yield put(setSyncDate(syncedAt));
+      yield put(requestUpdateEntities());
+    } catch (e) {
+      // Ignore
     }
-
-    yield delay(minute);
   }
 }
 
 export function* syncSaga() {
-  yield spawn(continuouslySyncEntities);
+  yield all([
+    takeLatest(requestSync, handleSync),
+    spawn(continuouslySyncEntities),
+  ]);
 }

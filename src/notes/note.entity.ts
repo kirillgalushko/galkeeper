@@ -1,4 +1,4 @@
-import { BaseEntity } from "../storage/base.entity";
+import { BaseEntity, Entity } from "../storage/base.entity";
 
 export interface NoteInit extends BaseEntity {
   readonly name?: string;
@@ -6,16 +6,13 @@ export interface NoteInit extends BaseEntity {
   readonly password?: string;
 }
 
-export class Note implements NoteInit {
-  id?: number;
-  localId?: number;
+export class Note extends Entity implements NoteInit {
   name?: string;
   login?: string;
   password?: string;
 
   constructor(note: NoteInit) {
-    this.id = note.id;
-    this.localId = note.localId;
+    super(note);
     this.name = note.name;
     this.login = note.login;
     this.password = note.password;

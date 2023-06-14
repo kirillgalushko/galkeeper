@@ -2,29 +2,31 @@ import React from "react";
 import { Modal, Text, Button, Input } from "@nextui-org/react";
 import { useDispatch } from "react-redux";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { createNote } from "../api";
 import { FetchError } from "../../api/FetchError";
 import { Note, NoteInit } from "../note.entity";
 import { saveEntity } from "../../entities/api";
-import { notesCollection } from "../notes.collection";
+import { db } from "../../storage/db";
 
 type Props = {
   onClose: () => void;
   open: boolean;
+  note?: Note | null;
 };
 
-export const CreateNoteModal = ({ open, onClose }: Props) => {
+export const EditNoteModal = ({ open, onClose, note }: Props) => {
   const {
     register: registerInput,
     handleSubmit,
     setError,
-  } = useForm<NoteInit>();
+  } = useForm<NoteInit>({
+    defaultValues: note ?? {},
+  });
   const dispatch = useDispatch();
 
   const onSubmit: SubmitHandler<NoteInit> = async (data) => {
     try {
-      const newNote = new Note(data);
-      await saveEntity(dispatch, newNote, notesCollection);
+      const noteToSave = new Note({ ...note, ...data });
+      await saveEntity(dispatch, noteToSave, db.notesCollection);
       onClose();
     } catch (e: unknown) {
       if (e instanceof FetchError) {
@@ -63,7 +65,7 @@ export const CreateNoteModal = ({ open, onClose }: Props) => {
             color="primary"
             size="lg"
             placeholder="Логин"
-            {...registerInput("login", { required: true })}
+            {...registerInput("login")}
           />
           <Input.Password
             clearable
@@ -72,7 +74,7 @@ export const CreateNoteModal = ({ open, onClose }: Props) => {
             color="primary"
             size="lg"
             placeholder="Password"
-            {...registerInput("password", { required: true })}
+            {...registerInput("password")}
           />
         </Modal.Body>
         <Modal.Footer>
