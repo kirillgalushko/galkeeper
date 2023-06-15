@@ -1,9 +1,9 @@
-import { call, put, takeLatest } from "redux-saga/effects";
+import { call, put, takeLatest, all } from "redux-saga/effects";
 import type { SagaIterator } from "redux-saga";
-import { clearToken, logout } from "./actions";
+import { afterLogin, clearToken, logout, setToken } from "./actions";
 import { clearAllEntities } from "../entities/api";
 import { requestUpdateEntities } from "../entities/actions";
-import { clearUser } from "../user/actions";
+import { clearUser, setUser } from "../user/actions";
 
 function* handleLogout(): SagaIterator<void> {
   yield call(clearAllEntities);
@@ -12,6 +12,18 @@ function* handleLogout(): SagaIterator<void> {
   yield put(clearUser());
 }
 
+function* handleAfterLogin(
+  action: ReturnType<typeof afterLogin>
+): SagaIterator<void> {
+  const { user, token } = action.payload;
+  yield put(setToken(token));
+  // TODO: Move to user saga
+  yield put(setUser(user));
+}
+
 export function* authSaga() {
-  yield takeLatest(logout, handleLogout);
+  yield all([
+    takeLatest(logout, handleLogout),
+    takeLatest(afterLogin, handleAfterLogin),
+  ]);
 }

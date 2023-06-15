@@ -1,8 +1,9 @@
-import { call, put, takeLatest } from "redux-saga/effects";
+import { call, put, takeLatest, all } from "redux-saga/effects";
 import type { SagaIterator } from "redux-saga";
 import { requestUpdateEntities, setEntities } from "./actions";
 import { getAllEntities } from "./api";
 import { Entities } from "./types";
+import { appReady } from "../common/actions";
 
 function* handleUpdateEntities(): SagaIterator<void> {
   const entities: Entities = yield call(getAllEntities);
@@ -10,5 +11,8 @@ function* handleUpdateEntities(): SagaIterator<void> {
 }
 
 export function* entitiesSaga() {
-  yield takeLatest(requestUpdateEntities, handleUpdateEntities);
+  yield all([
+    takeLatest(appReady, handleUpdateEntities),
+    takeLatest(requestUpdateEntities, handleUpdateEntities),
+  ]);
 }

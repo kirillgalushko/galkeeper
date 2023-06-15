@@ -4,6 +4,7 @@ import { AnyAction } from "redux";
 import { BaseCollection } from "../storage/base.collection";
 import { requestUpdateEntities } from "./actions";
 import { db } from "../storage/db";
+import { requestSync } from "../sync/actions";
 
 export const getAllEntities = async (): Promise<Entities> => {
   return await db.getAll(true);
@@ -26,6 +27,7 @@ export const saveEntity = async function <T>(
     throw new Error(`Can\'t save the entity: ${entity}`);
   }
   dispatch(requestUpdateEntities());
+  dispatch(requestSync());
   return savedEntity;
 };
 
@@ -36,4 +38,5 @@ export const removeEntity = async function <T>(
 ): Promise<void> {
   await collection.remove(entity);
   dispatch(requestUpdateEntities());
+  dispatch(requestSync());
 };

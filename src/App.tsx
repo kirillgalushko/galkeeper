@@ -4,7 +4,7 @@ import { useDarkMode } from "./hooks/useDarkMode";
 import { store } from "./storage/redux";
 import { Router } from "./router";
 import { useDispatch } from "react-redux";
-import { requestUpdateEntities } from "./entities/actions";
+import { appReady } from "./common/actions";
 
 const lightTheme = createTheme({
   type: "light",
@@ -20,7 +20,7 @@ const App = () => {
   console.log(store.getState());
 
   useEffect(() => {
-    dispatch(requestUpdateEntities());
+    dispatch(appReady());
   }, []);
 
   return (

@@ -1,6 +1,6 @@
 import { post } from "../api/http";
 import { Entities } from "../entities/types";
-import { BaseCollection, Collection } from "../storage/base.collection";
+import { Collection } from "../storage/base.collection";
 import { BaseEntity, Entity } from "../storage/base.entity";
 import { db } from "../storage/db";
 import { SyncRequest, SyncResponse } from "./types";

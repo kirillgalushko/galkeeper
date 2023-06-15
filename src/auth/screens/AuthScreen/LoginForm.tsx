@@ -2,8 +2,7 @@ import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { login } from "../../api";
 import { useDispatch } from "react-redux";
-import { setToken } from "../../actions";
-import { setUser } from "../../../user/actions";
+import { afterLogin } from "../../actions";
 import { Grid, Button, Input, Text, Link } from "@nextui-org/react";
 import { FetchError } from "../../../api/FetchError";
 
@@ -28,8 +27,7 @@ export const LoginForm = ({ onRegistration }: Props) => {
   const onSubmit: SubmitHandler<FormData> = async (data) => {
     try {
       const { user, access_token } = await login(data);
-      dispatch(setToken(access_token));
-      dispatch(setUser(user));
+      dispatch(afterLogin({ token: access_token, user }));
     } catch (e: unknown) {
       if (e instanceof FetchError) {
         setError("root", { message: e.message });

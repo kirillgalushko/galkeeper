@@ -1,29 +1,23 @@
-import {
-  spawn,
-  select,
-  delay,
-  call,
-  put,
-  takeLatest,
-  all,
-} from "redux-saga/effects";
+import { select, call, put, takeLatest, all } from "redux-saga/effects";
 import type { SagaIterator } from "redux-saga";
 import { isAuthorizedSelector } from "../auth/selectors";
 import { sync } from "./api";
 import { requestUpdateEntities } from "../entities/actions";
-import { setSyncDate, requestSync } from "./actions";
+import {
+  setSyncDate,
+  requestSync,
+  syncSuccess,
+  requestSoftSync,
+} from "./actions";
 import { syncedAtSelector } from "./selectors";
+import { afterLogin } from "../auth/actions";
+import { appReady } from "../common/actions";
+import { Action } from "redux";
 
-const timeout = 5000;
-
-function* continuouslySyncEntities(): SagaIterator<void> {
-  while (true) {
-    yield call(handleSync);
-    yield delay(timeout);
-  }
-}
-
-function* handleSync(): SagaIterator<void> {
+function* handleSync(
+  _action: Action,
+  skipSuccess?: boolean
+): SagaIterator<void> {
   const isAuthorized = isAuthorizedSelector(yield select());
   const lastSyncedAt = syncedAtSelector(yield select()) ?? undefined;
 
@@ -32,6 +26,9 @@ function* handleSync(): SagaIterator<void> {
       const syncedAt: Date = yield call(() => sync(lastSyncedAt));
       yield put(setSyncDate(syncedAt));
       yield put(requestUpdateEntities());
+      if (!skipSuccess) {
+        yield put(syncSuccess());
+      }
     } catch (e) {
       // Ignore
     }
@@ -41,6 +38,8 @@ function* handleSync(): SagaIterator<void> {
 export function* syncSaga() {
   yield all([
     takeLatest(requestSync, handleSync),
-    spawn(continuouslySyncEntities),
+    takeLatest(requestSoftSync, (action) => handleSync(action, true)),
+    takeLatest(appReady, handleSync),
+    takeLatest(afterLogin, handleSync),
   ]);
 }
