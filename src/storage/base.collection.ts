@@ -12,7 +12,7 @@ export interface BaseCollection<T> {
   remove: (entity: T) => Promise<void>;
   destroy: (entity: T) => Promise<void>;
   rewrite: (entity: T) => Promise<T | undefined>;
-  getAll: () => Promise<T[]>;
+  getAll: (skipDeletedEntities?: boolean) => Promise<T[]>;
   clearAll: () => Promise<void>;
 }
 
@@ -85,7 +85,12 @@ export abstract class Collection<EntityType extends BaseEntity>
     return this.getByLocalId(updatedEntityLocalId);
   }
 
-  async getAll() {
+  async getAll(skipDeletedEntities?: boolean) {
+    if (skipDeletedEntities) {
+      return this.collection
+        .filter((entity) => entity.status != "deleted")
+        .toArray();
+    }
     return this.collection.toArray();
   }
 

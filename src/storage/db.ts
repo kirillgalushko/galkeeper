@@ -18,13 +18,13 @@ export class Database {
     }
   }
 
-  async getAll() {
+  async getAll(skipDeletedEntities?: boolean) {
     const allEntities: Record<CollectionName, BaseEntity[]> = {} as Record<
       CollectionName,
       BaseEntity[]
     >;
     for (const collection of this.collections) {
-      const entities = await collection.getAll();
+      const entities = await collection.getAll(skipDeletedEntities);
       allEntities[collection.collectionName] = entities;
     }
     return allEntities;

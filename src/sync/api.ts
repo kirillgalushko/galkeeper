@@ -1,5 +1,4 @@
 import { post } from "../api/http";
-import { getAllEntities } from "../entities/api";
 import { Entities } from "../entities/types";
 import { BaseCollection, Collection } from "../storage/base.collection";
 import { BaseEntity, Entity } from "../storage/base.entity";
@@ -22,7 +21,7 @@ const syncRequest = async (data: SyncRequest): Promise<SyncResponse> =>
   await post("/sync", data);
 
 export const sync = async (lastSyncedAt?: Date) => {
-  const entities = await getAllEntities();
+  const entities = await db.getAll();
   const pushData = {
     syncedAt: lastSyncedAt,
     updated: {},

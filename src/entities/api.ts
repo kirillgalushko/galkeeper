@@ -6,7 +6,7 @@ import { requestUpdateEntities } from "./actions";
 import { db } from "../storage/db";
 
 export const getAllEntities = async (): Promise<Entities> => {
-  return db.getAll();
+  return await db.getAll(true);
 };
 
 export const clearAllEntities = async (): Promise<void> => {
