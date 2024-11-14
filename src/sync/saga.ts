@@ -8,9 +8,10 @@ import {
   requestSync,
   syncSuccess,
   requestSoftSync,
+  clearSyncDate,
 } from "./actions";
 import { syncedAtSelector } from "./selectors";
-import { afterLogin } from "../auth/actions";
+import { logout, setToken } from "../auth/actions";
 import { appReady } from "../common/actions";
 import { Action } from "redux";
 
@@ -35,11 +36,16 @@ function* handleSync(
   }
 }
 
+function* handleLogout(): SagaIterator<void> {
+  yield put(clearSyncDate());
+}
+
 export function* syncSaga() {
   yield all([
     takeLatest(requestSync, handleSync),
     takeLatest(requestSoftSync, (action) => handleSync(action, true)),
     takeLatest(appReady, handleSync),
-    takeLatest(afterLogin, handleSync),
+    takeLatest(setToken, handleSync),
+    takeLatest(logout, handleLogout),
   ]);
 }

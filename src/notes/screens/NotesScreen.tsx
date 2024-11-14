@@ -43,7 +43,9 @@ export const NotesScreen = () => {
             <div className={styles.card}>
               <span>
                 <Text h3>{note.id}</Text>
-                {JSON.stringify(note)}
+                <Text>
+                  {note.name} - {note.login} - {note.password}
+                </Text>
               </span>
               <Button auto onPress={() => onEditNote(note)}>
                 Edit

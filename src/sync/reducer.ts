@@ -1,5 +1,5 @@
 import { createReducer } from "@reduxjs/toolkit";
-import { setSyncDate } from "./actions";
+import { setSyncDate, clearSyncDate } from "./actions";
 
 type State = {
   syncedAt: Date | null;
@@ -10,8 +10,13 @@ const defaultState: State = {
 };
 
 export const syncReducer = createReducer<State>(defaultState, (builder) => {
-  builder.addCase(setSyncDate, (state, action) => ({
-    ...state,
-    syncedAt: new Date(action.payload),
-  }));
+  builder
+    .addCase(setSyncDate, (state, action) => ({
+      ...state,
+      syncedAt: new Date(action.payload),
+    }))
+    .addCase(clearSyncDate, (state) => ({
+      ...state,
+      syncedAt: null,
+    }));
 });

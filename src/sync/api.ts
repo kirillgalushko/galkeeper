@@ -20,34 +20,37 @@ const withoutLocalFields = (entity: BaseEntity) => {
 const syncRequest = async (data: SyncRequest): Promise<SyncResponse> =>
   await post("/sync", data);
 
+const isUpdatedEntity = (entity: BaseEntity, since?: Date) =>
+  !since ||
+  (entity.updatedAt && entity.status !== "deleted" && entity.updatedAt > since);
+
+const isDeletedEntity = (entity: BaseEntity) =>
+  entity.id && entity.status === "deleted";
+
 export const sync = async (lastSyncedAt?: Date) => {
-  const entities = await db.getAll();
+  // const entities = await db.getAll();
   const pushData = {
     syncedAt: lastSyncedAt,
     updated: {},
     deleted: {},
   } as SyncRequest;
-  for (const [collectionName, collectionEntities] of Object.entries(entities)) {
-    const updatedEntities = collectionEntities
-      .filter(
-        (entity: Entity) =>
-          !lastSyncedAt ||
-          (entity.updatedAt &&
-            entity.status !== "deleted" &&
-            entity.updatedAt > lastSyncedAt)
-      )
-      .map((entity: Entity) => withoutLocalFields(entity));
-    const deletedEntitiesIds = Array.from(
-      new Set(
-        collectionEntities
-          .filter(
-            (entity: BaseEntity) => entity.id && entity.status === "deleted"
-          )
-          .map((entity: BaseEntity) => entity.id)
-      )
-    ) as number[];
-    pushData.updated[collectionName as keyof Entities] = updatedEntities;
-    pushData.deleted[collectionName as keyof Entities] = deletedEntitiesIds;
+  for (const collection of db.collections) {
+    pushData.updated[collection.collectionName] = [];
+    pushData.deleted[collection.collectionName] = [];
+    const collectionEntities = await collection.getAll();
+    for (const entity of collectionEntities) {
+      if (isUpdatedEntity(entity, lastSyncedAt)) {
+        // @ts-expect-error TODO:
+        const encryptedEntity = await collection.encrypt(entity);
+        pushData.updated[collection.collectionName].push(
+          withoutLocalFields(encryptedEntity)
+        );
+      }
+
+      if (isDeletedEntity(entity)) {
+        pushData.deleted[collection.collectionName].push(entity.id as number);
+      }
+    }
   }
   const syncedData = await syncRequest(pushData);
   return await saveSyncResponse(syncedData);
@@ -82,8 +85,10 @@ export const setSyncEntity = async (
   entity: BaseEntity,
   collection: Collection<BaseEntity>
 ) => {
-  const newEntity = { ...entity };
-  const oldEntity = await collection.getByIds(entity);
+  // @ts-expect-error
+  const decryptedEntity = await collection.decrypt(entity);
+  const newEntity = { ...decryptedEntity };
+  const oldEntity = await collection.getByIds(decryptedEntity);
   if (oldEntity?.status === "synced") {
     delete newEntity.localId;
   }
