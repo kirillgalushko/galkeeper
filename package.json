@@ -1,11 +1,10 @@
 {
-  "name": "passwords",
+  "name": "galkeeper",
   "version": "1.0.0",
   "description": "Password storage",
   "main": "public/electron.js",
   "homepage": "./",
-  "author": "John Doe",
-  "license": "MIT",
+  "author": "Kirill Galushko",
   "scripts": {
     "dev": "webpack serve --port 3000",
     "build": "NODE_ENV=production webpack",
@@ -13,7 +12,7 @@
     "dist": "electron-builder -m --x64 --arm64 -c.extraMetadata.main=build/electron.js"
   },
   "build": {
-    "appId": "icons.for.free",
+    "appId": "galkeeper.app",
     "files": [
       "build/**/*",
       "node_modules/**/*"
